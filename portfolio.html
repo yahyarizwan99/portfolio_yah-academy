@@ -64,8 +64,9 @@
   a{ color: inherit; text-decoration: none; }
   a:focus-visible, button:focus-visible{ outline: 2px solid var(--mint); outline-offset: 3px; border-radius: 4px; }
 
-  /* Custom cursor — a clean arrow, no trail. Falls back to the system
-     cursor on touch devices and when a mouse isn't present. */
+  /* Custom cursor — a clean arrow with a warm orange-red trail behind it.
+     Falls back to the system cursor on touch devices and when a mouse
+     isn't present. */
   @media (hover: hover) and (pointer: fine){
     body, a, button{ cursor: none; }
 
@@ -79,6 +80,16 @@
       transform-origin: 3px 2px;
     }
     #cursor.is-hovering svg{ transform: scale(1.4); }
+
+    /* Trail dots — sit just under the arrow, fading and shrinking as they
+       lag behind. Colour is set per-dot in JS so each one can shift from
+       bright orange at the front to deep red at the tail. */
+    .cursor-trail{
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      pointer-events: none; will-change: transform;
+      border-radius: 50%;
+      mix-blend-mode: screen;
+    }
   }
 
   .wrap{ max-width: 1000px; margin: 0 auto; padding: 0 28px; }
@@ -362,8 +373,8 @@
 
 <script>
   // ---- Custom cursor -------------------------------------------------
-  // A single arrow that follows the pointer. No trail elements, so there's
-  // nothing streaming out behind it.
+  // An arrow that follows the pointer, with a warm orange-to-red trail of
+  // dots easing along behind it.
   (function(){
     var cursor = document.getElementById('cursor');
     if (!cursor) return;
@@ -392,6 +403,63 @@
 
     // Expose pointer position for the starfield below
     window.__pointer = { get x(){ return cx; }, get y(){ return cy; } };
+
+    // ---- Trail -------------------------------------------------------
+    // Each dot chases the one in front of it, so the whole chain lags
+    // smoothly behind the arrow. Colour runs from bright orange at the
+    // head to deep red at the tail; size and opacity taper off too.
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    var TRAIL_COUNT = 14;
+    var trail = [];
+
+    for (var t = 0; t < TRAIL_COUNT; t++){
+      var el = document.createElement('div');
+      el.className = 'cursor-trail';
+
+      var progress = t / (TRAIL_COUNT - 1);   // 0 at head, 1 at tail
+      var size = 13 - progress * 8;            // 13px down to 5px
+      // Orange (255,140,30) easing into a deep red (200,30,20)
+      var r = Math.round(255 - progress * 55);
+      var g = Math.round(140 - progress * 110);
+      var b = Math.round(30 - progress * 10);
+      var alpha = 0.55 - progress * 0.42;
+
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.marginLeft = (-size / 2) + 'px';
+      el.style.marginTop = (-size / 2) + 'px';
+      el.style.background = 'rgb(' + r + ',' + g + ',' + b + ')';
+      el.style.opacity = alpha;
+      el.style.boxShadow = '0 0 ' + (10 - progress * 6) + 'px rgba(' + r + ',' + g + ',' + b + ',0.7)';
+
+      document.body.appendChild(el);
+      trail.push({ el: el, x: cx, y: cy });
+    }
+
+    function animateTrail(){
+      var prevX = cx, prevY = cy;
+      for (var i = 0; i < trail.length; i++){
+        var dot = trail[i];
+        // Each dot eases toward the position of the thing ahead of it
+        dot.x += (prevX - dot.x) * 0.35;
+        dot.y += (prevY - dot.y) * 0.35;
+        dot.el.style.transform = 'translate3d(' + dot.x + 'px,' + dot.y + 'px,0)';
+        prevX = dot.x;
+        prevY = dot.y;
+      }
+      requestAnimationFrame(animateTrail);
+    }
+    requestAnimationFrame(animateTrail);
+
+    // Hide the trail along with the arrow when the pointer leaves the page
+    document.addEventListener('mouseleave', function(){
+      for (var i = 0; i < trail.length; i++) trail[i].el.style.visibility = 'hidden';
+    });
+    document.addEventListener('mouseenter', function(){
+      for (var i = 0; i < trail.length; i++) trail[i].el.style.visibility = 'visible';
+    });
   })();
 
   // ---- Starfield -----------------------------------------------------
