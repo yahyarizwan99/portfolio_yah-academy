@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Yahya Rizwan — Portfolio</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --space-1: #0B1026;
+    --space-2: #16203F;
+    --space-3: #2A1B3D;
+    --space-4: #0E2A33;
+    --mint: #6EE7B7;
+    --mint-soft: #A7F3D0;
+    --text: #E4E9F5;
+    --text-dim: #A3ADC7;
+    --card: rgba(255,255,255,0.05);
+    --card-line: rgba(255,255,255,0.12);
+
+    --display: 'Poppins', sans-serif;
+    --body: 'Inter', sans-serif;
+  }
+
+  *{ box-sizing: border-box; margin:0; padding:0; }
+  html{ scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce){
+    html{ scroll-behavior: auto; }
+    *{ animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+  }
+
+  body{
+    font-family: var(--body);
+    color: var(--text);
+    background: var(--space-1);
+    line-height: 1.7;
+    overflow-x: hidden;
+    position: relative;
+  }
+
+  /* Layered nebula background */
+  body::before{
+    content:""; position: fixed; inset: 0; z-index: -2;
+    background:
+      radial-gradient(ellipse 70% 50% at 20% 15%, var(--space-4) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 40%, var(--space-3) 0%, transparent 60%),
+      radial-gradient(ellipse 80% 60% at 50% 85%, var(--space-2) 0%, transparent 65%),
+      var(--space-1);
+  }
+
+  /* Starfield */
+  #stars{ position: fixed; inset: 0; z-index: -1; pointer-events: none; }
+  .star{
+    position: absolute; border-radius: 50%; background: #fff;
+    animation: twinkle 4s infinite ease-in-out;
+  }
+  @keyframes twinkle{
+    0%, 100%{ opacity: 0.25; }
+    50%{ opacity: 0.9; }
+  }
+
+  a{ color: inherit; text-decoration: none; }
+  a:focus-visible, button:focus-visible{ outline: 2px solid var(--mint); outline-offset: 3px; border-radius: 4px; }
+
+  /* Custom cursor — a clean arrow with a warm orange-red trail behind it.
+     Falls back to the system cursor on touch devices and when a mouse
+     isn't present. */
+  @media (hover: hover) and (pointer: fine){
+    body, a, button{ cursor: none; }
+
+    #cursor{
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      pointer-events: none; will-change: transform;
+    }
+    #cursor svg{
+      display:block;
+      transition: transform 0.15s ease-out;
+      transform-origin: 3px 2px;
+    }
+    #cursor.is-hovering svg{ transform: scale(1.4); }
+
+    /* Trail dots — sit just under the arrow, fading and shrinking as they
+       lag behind. Colour is set per-dot in JS so each one can shift from
+       bright orange at the front to deep red at the tail. */
+    .cursor-trail{
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      pointer-events: none; will-change: transform;
+      border-radius: 50%;
+      mix-blend-mode: screen;
+    }
+  }
+
+  .wrap{ max-width: 1000px; margin: 0 auto; padding: 0 28px; }
+
+  /* Nav */
+  nav{
+    position: sticky; top: 0; z-index: 50;
+    backdrop-filter: blur(10px);
+    background: rgba(11,16,38,0.7);
+    border-bottom: 1px solid rgba(255,255,255,0.07);
+  }
+  .nav-inner{
+    max-width: 1000px; margin: 0 auto; padding: 16px 28px;
+    display:flex; align-items:center; justify-content:space-between;
+  }
+  .nav-name{
+    font-family: var(--display); font-weight: 700; font-size: 1.05rem;
+    color: var(--mint);
+  }
+  .nav-links a{
+    font-size: 0.9rem; color: var(--text-dim); margin-left: 26px;
+    transition: color 0.2s;
+  }
+  .nav-links a:hover{ color: var(--mint); }
+
+  /* Section headings — the glowing centerpiece */
+  .section-title{
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(2.2rem, 6vw, 3.6rem);
+    color: var(--mint); text-align: center;
+    letter-spacing: -0.01em; line-height: 1.15;
+    text-shadow: 0 0 24px rgba(110,231,183,0.45), 0 0 60px rgba(110,231,183,0.18);
+    margin-bottom: 14px;
+  }
+  .section-sub{
+    text-align:center; color: var(--text-dim); font-size: 1rem;
+    max-width: 52ch; margin: 0 auto 56px;
+  }
+
+  section{ padding: 90px 0; }
+  .divider{ height:1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.12), transparent); }
+
+  /* Hero */
+  .hero{ padding: 120px 0 100px; text-align:center; }
+  .hero h1{
+    font-family: var(--display); font-weight: 700;
+    font-size: clamp(2.6rem, 8vw, 4.6rem); color: var(--mint);
+    line-height: 1.1; letter-spacing: -0.02em;
+    text-shadow: 0 0 30px rgba(110,231,183,0.5), 0 0 80px rgba(110,231,183,0.2);
+  }
+  .hero-role{
+    font-family: var(--display); font-weight: 500;
+    font-size: clamp(1rem, 2.6vw, 1.3rem); color: var(--text);
+    margin-top: 18px;
+  }
+  .hero p{
+    margin: 22px auto 0; color: var(--text-dim); max-width: 50ch; font-size: 1.02rem;
+  }
+  .btn{
+    font-family: var(--display); font-weight: 600; font-size: 0.95rem;
+    padding: 13px 28px; border-radius: 999px; transition: transform 0.2s, box-shadow 0.2s;
+    display:inline-block;
+  }
+  .btn-primary{
+    background: var(--mint); color: #08211A;
+    box-shadow: 0 10px 30px -8px rgba(110,231,183,0.5);
+  }
+  .btn-primary:hover{ transform: translateY(-2px); box-shadow: 0 16px 38px -8px rgba(110,231,183,0.65); }
+  .btn-ghost{ border: 1px solid var(--card-line); color: var(--text); background: var(--card); }
+  .btn-ghost:hover{ transform: translateY(-2px); border-color: var(--mint); color: var(--mint); }
+
+  /* About */
+  .about-grid{
+    display:grid; grid-template-columns: 1fr 1fr; gap: 30px;
+    max-width: 860px; margin: 0 auto;
+  }
+  .about-card{
+    background: var(--card); border: 1px solid var(--card-line);
+    border-radius: 16px; padding: 30px 28px;
+    transition: transform 0.25s, border-color 0.25s;
+  }
+  .about-card:hover{ transform: translateY(-4px); border-color: rgba(110,231,183,0.4); }
+  .about-card h3{
+    font-family: var(--display); font-weight: 600; font-size: 1.15rem;
+    color: var(--mint); margin-bottom: 10px;
+  }
+  .about-card p{ color: var(--text-dim); font-size: 0.95rem; }
+
+  /* Projects */
+  .projects{ display:flex; flex-direction: column; gap: 22px; max-width: 860px; margin: 0 auto; }
+  .project{
+    display:block; position: relative;
+    background: var(--card); border: 1px solid var(--card-line);
+    border-radius: 16px; padding: 30px 30px;
+    transition: transform 0.25s, border-color 0.25s, box-shadow 0.25s;
+  }
+  .project:hover{
+    transform: translateY(-4px); border-color: rgba(110,231,183,0.45);
+    box-shadow: 0 20px 44px -18px rgba(110,231,183,0.28);
+  }
+  .project-head{
+    display:flex; align-items:center; justify-content:space-between; gap: 16px; flex-wrap: wrap;
+  }
+  .project-title{
+    font-family: var(--display); font-weight: 600; font-size: 1.35rem; color: var(--text);
+  }
+  .project:hover .project-title{ color: var(--mint); }
+  .project-arrow{ color: var(--mint); font-size: 1.1rem; opacity:0; transition: opacity 0.25s, transform 0.25s; }
+  .project:hover .project-arrow{ opacity:1; transform: translateX(4px); }
+  .project-desc{ color: var(--text-dim); font-size: 0.96rem; margin-top: 10px; max-width: 58ch; }
+
+  .tags{ display:flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; }
+  .tag{
+    font-size: 0.82rem; color: var(--text);
+    background: rgba(255,255,255,0.06); border: 1px solid var(--card-line);
+    padding: 6px 15px; border-radius: 999px;
+  }
+  .tag-version{
+    background: rgba(110,231,183,0.16); border-color: rgba(110,231,183,0.5);
+    color: var(--mint); font-weight: 500;
+  }
+  .project.is-soon{ opacity: 0.55; }
+  .project.is-soon:hover{ transform:none; border-color: var(--card-line); box-shadow:none; }
+  .project.is-soon .project-title{ color: var(--text-dim); }
+
+  /* Contact */
+  .contact-box{
+    max-width: 620px; margin: 0 auto; text-align:center;
+    background: var(--card); border: 1px solid var(--card-line);
+    border-radius: 20px; padding: 46px 34px;
+  }
+  .contact-box p{ color: var(--text-dim); margin-bottom: 26px; }
+  .contact-links{ display:flex; gap: 14px; justify-content:center; flex-wrap: wrap; }
+
+  footer{
+    padding: 36px 0 44px; text-align:center;
+    color: var(--text-dim); font-size: 0.86rem;
+    border-top: 1px solid rgba(255,255,255,0.07);
+  }
+
+  @media (max-width: 700px){
+    .about-grid{ grid-template-columns: 1fr; }
+    section{ padding: 70px 0; }
+    .hero{ padding: 80px 0 70px; }
+    .nav-links a{ margin-left: 16px; font-size: 0.84rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="stars" aria-hidden="true"></div>
+
+<div id="cursor" aria-hidden="true">
+  <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+    <path d="M3 2L16.5 11.2L10.2 12.1L7.4 18.2L3 2Z"
+          fill="#6EE7B7" stroke="#08211A" stroke-width="1.2" stroke-linejoin="round"/>
+  </svg>
+</div>
+
+<nav>
+  <div class="nav-inner">
+    <span class="nav-name">Yahya Rizwan</span>
+    <div class="nav-links">
+      <a href="#about">About</a>
+      <a href="#work">Projects</a>
+      <a href="#contact">Contact</a>
+    </div>
+  </div>
+</nav>
+
+<div class="wrap">
+
+  <header class="hero">
+    <h1>Yahya Rizwan</h1>
+    <div class="hero-role">Student &amp; self-taught builder</div>
+    <p>I'm learning to code by building real things and putting them online. This is where I keep track of what I've shipped so far.</p>
+  </header>
+
+  <div class="divider"></div>
+
+  <section id="about">
+    <h2 class="section-title">About Me</h2>
+    <p class="section-sub">Still early in the journey, and learning fastest by finishing things rather than just watching tutorials.</p>
+
+    <div class="about-grid">
+      <div class="about-card">
+        <h3>How I learn</h3>
+        <p>By building. Every project here started as something I didn't know how to do yet, and finished as something live on the internet.</p>
+      </div>
+      <div class="about-card">
+        <h3>What I'm into</h3>
+        <p>Websites and web apps — designing them, making them work on any screen, and getting them deployed properly.</p>
+      </div>
+      <div class="about-card">
+        <h3>Right now</h3>
+        <p>Working on Yah Academy and figuring out what comes next. Each version teaches me something the last one didn't.</p>
+      </div>
+      <div class="about-card">
+        <h3>What's next</h3>
+        <p>More projects, better code, and steadily fewer things I have to look up twice.</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="work">
+    <h2 class="section-title">Featured Projects</h2>
+    <p class="section-sub">Everything here is live and built by me. New versions get their own entry.</p>
+
+    <!--
+      TO ADD A NEW PROJECT OR VERSION:
+      Copy one whole <a class="project"> ... </a> block below and edit it.
+      - Change the title, description, and href link
+      - Update the version badge: <span class="tag tag-version">v2.0</span>
+      - Remove class="is-soon" (and add a real href) once the project is live
+    -->
+
+    <div class="projects">
+
+      <a class="project" href="https://yahyarizwan99.github.io/yah-academy/" target="_blank" rel="noopener">
+        <div class="project-head">
+          <span class="project-title">Yah Academy</span>
+          <span class="project-arrow">Visit &rarr;</span>
+        </div>
+        <p class="project-desc">The first build — a project-based online course platform with eight courses across frontend, data, product, and language, made installable as a web app.</p>
+        <div class="tags">
+          <span class="tag tag-version">v1.0</span>
+          <span class="tag">Web App</span>
+          <span class="tag">PWA</span>
+          <span class="tag">Live</span>
+        </div>
+      </a>
+
+      <a class="project" href="https://yahyarizwan99.github.io/yah-academy-ver.2/yah-academy.html" target="_blank" rel="noopener">
+        <div class="project-head">
+          <span class="project-title">Yah Academy</span>
+          <span class="project-arrow">Visit &rarr;</span>
+        </div>
+        <p class="project-desc">The current build — same eight courses, now with an AI tutor that answers questions about any course, plus student sign-up and login backed by a real database.</p>
+        <div class="tags">
+          <span class="tag tag-version">v2.0</span>
+          <span class="tag">AI Chatbot</span>
+          <span class="tag">Auth</span>
+          <span class="tag">Live</span>
+        </div>
+      </a>
+
+      <div class="project is-soon">
+        <div class="project-head">
+          <span class="project-title">Next project</span>
+        </div>
+        <p class="project-desc">Another slot, ready whenever you are.</p>
+        <div class="tags">
+          <span class="tag tag-version">v3.0</span>
+          <span class="tag">Coming soon</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <section id="contact">
+    <h2 class="section-title">Feedback</h2>
+    <p class="section-sub">Found a bug, or got an idea for how this could be better? Open an issue on GitHub and I'll see it.</p>
+    <div class="contact-box">
+      <p>Feedback goes through GitHub Issues, so you'll need a GitHub account to post. It's free to make one, and it means we can keep the conversation in one place.</p>
+      <div class="contact-links">
+        <a class="btn btn-primary"
+           href="https://github.com/yahyarizwan99/yah-academy/issues/new?title=Feedback&body=What%20could%20be%20better%3F%0A%0A"
+           target="_blank" rel="noopener">Leave feedback</a>
+        <a class="btn btn-ghost" href="https://github.com/yahyarizwan99" target="_blank" rel="noopener">My GitHub</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  © 2026 Yahya Rizwan · Built and shipped by hand
+</footer>
+
+<script>
+  // ---- Custom cursor -------------------------------------------------
+  // An arrow that follows the pointer, with a warm orange-to-red trail of
+  // dots easing along behind it.
+  (function(){
+    var cursor = document.getElementById('cursor');
+    if (!cursor) return;
+    if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      cursor.style.display = 'none';
+      return;
+    }
+
+    var cx = window.innerWidth / 2, cy = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', function(e){
+      cx = e.clientX; cy = e.clientY;
+      // translate3d keeps this on the GPU so the arrow never lags or smears
+      cursor.style.transform = 'translate3d(' + cx + 'px,' + cy + 'px,0)';
+    }, { passive: true });
+
+    // Grow slightly over things you can click
+    var interactive = document.querySelectorAll('a, button');
+    for (var i = 0; i < interactive.length; i++){
+      interactive[i].addEventListener('mouseenter', function(){ cursor.classList.add('is-hovering'); });
+      interactive[i].addEventListener('mouseleave', function(){ cursor.classList.remove('is-hovering'); });
+    }
+
+    document.addEventListener('mouseleave', function(){ cursor.style.opacity = '0'; });
+    document.addEventListener('mouseenter', function(){ cursor.style.opacity = '1'; });
+
+    // Expose pointer position for the starfield below
+    window.__pointer = { get x(){ return cx; }, get y(){ return cy; } };
+
+    // ---- Trail -------------------------------------------------------
+    // Each dot chases the one in front of it, so the whole chain lags
+    // smoothly behind the arrow. Colour runs from bright orange at the
+    // head to deep red at the tail; size and opacity taper off too.
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (reduceMotion) return;
+
+    var TRAIL_COUNT = 14;
+    var trail = [];
+
+    for (var t = 0; t < TRAIL_COUNT; t++){
+      var el = document.createElement('div');
+      el.className = 'cursor-trail';
+
+      var progress = t / (TRAIL_COUNT - 1);   // 0 at head, 1 at tail
+      var size = 13 - progress * 8;            // 13px down to 5px
+      // Orange (255,140,30) easing into a deep red (200,30,20)
+      var r = Math.round(255 - progress * 55);
+      var g = Math.round(140 - progress * 110);
+      var b = Math.round(30 - progress * 10);
+      var alpha = 0.55 - progress * 0.42;
+
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.marginLeft = (-size / 2) + 'px';
+      el.style.marginTop = (-size / 2) + 'px';
+      el.style.background = 'rgb(' + r + ',' + g + ',' + b + ')';
+      el.style.opacity = alpha;
+      el.style.boxShadow = '0 0 ' + (10 - progress * 6) + 'px rgba(' + r + ',' + g + ',' + b + ',0.7)';
+
+      document.body.appendChild(el);
+      trail.push({ el: el, x: cx, y: cy });
+    }
+
+    function animateTrail(){
+      var prevX = cx, prevY = cy;
+      for (var i = 0; i < trail.length; i++){
+        var dot = trail[i];
+        // Each dot eases toward the position of the thing ahead of it
+        dot.x += (prevX - dot.x) * 0.35;
+        dot.y += (prevY - dot.y) * 0.35;
+        dot.el.style.transform = 'translate3d(' + dot.x + 'px,' + dot.y + 'px,0)';
+        prevX = dot.x;
+        prevY = dot.y;
+      }
+      requestAnimationFrame(animateTrail);
+    }
+    requestAnimationFrame(animateTrail);
+
+    // Hide the trail along with the arrow when the pointer leaves the page
+    document.addEventListener('mouseleave', function(){
+      for (var i = 0; i < trail.length; i++) trail[i].el.style.visibility = 'hidden';
+    });
+    document.addEventListener('mouseenter', function(){
+      for (var i = 0; i < trail.length; i++) trail[i].el.style.visibility = 'visible';
+    });
+  })();
+
+  // ---- Starfield -----------------------------------------------------
+  // Stars are stored with their own home position, then nudged away when
+  // the pointer gets close and eased back once it leaves.
+  (function(){
+    var container = document.getElementById('stars');
+    if (!container) return;
+
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var finePointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+    var count = window.innerWidth < 700 ? 70 : 140;
+    var stars = [];
+    var frag = document.createDocumentFragment();
+
+    for (var i = 0; i < count; i++){
+      var el = document.createElement('span');
+      el.className = 'star';
+      var size = Math.random() * 2.2 + 0.8;
+      var homeX = Math.random() * window.innerWidth;
+      var homeY = Math.random() * window.innerHeight;
+
+      el.style.width = size + 'px';
+      el.style.height = size + 'px';
+      el.style.left = '0px';
+      el.style.top = '0px';
+      el.style.transform = 'translate3d(' + homeX + 'px,' + homeY + 'px,0)';
+
+      if (reduceMotion){
+        el.style.animation = 'none';
+        el.style.opacity = 0.5;
+      } else {
+        el.style.animationDelay = (Math.random() * 4) + 's';
+        el.style.animationDuration = (3 + Math.random() * 3) + 's';
+      }
+      if (Math.random() > 0.85) el.style.background = '#6EE7B7';
+
+      stars.push({ el: el, homeX: homeX, homeY: homeY, x: homeX, y: homeY });
+      frag.appendChild(el);
+    }
+    container.appendChild(frag);
+
+    // Skip the interaction loop entirely on touch devices or when the user
+    // prefers reduced motion — the stars just sit still.
+    if (!finePointer || reduceMotion) return;
+
+    var REPEL_RADIUS = 110;   // how close the pointer must get
+    var REPEL_STRENGTH = 55;  // how far a star is pushed
+    var EASE = 0.12;          // how quickly stars drift back home
+
+    function tick(){
+      var p = window.__pointer;
+      var px = p ? p.x : -9999;
+      var py = p ? p.y : -9999;
+
+      for (var i = 0; i < stars.length; i++){
+        var s = stars[i];
+        var targetX = s.homeX;
+        var targetY = s.homeY;
+
+        var dx = s.homeX - px;
+        var dy = s.homeY - py;
+        var dist = Math.sqrt(dx*dx + dy*dy);
+
+        if (dist < REPEL_RADIUS && dist > 0){
+          // closer pointer = stronger push
+          var force = (1 - dist / REPEL_RADIUS) * REPEL_STRENGTH;
+          targetX = s.homeX + (dx / dist) * force;
+          targetY = s.homeY + (dy / dist) * force;
+        }
+
+        s.x += (targetX - s.x) * EASE;
+        s.y += (targetY - s.y) * EASE;
+        s.el.style.transform = 'translate3d(' + s.x + 'px,' + s.y + 'px,0)';
+      }
+      requestAnimationFrame(tick);
+    }
+    requestAnimationFrame(tick);
+
+    // Re-scatter stars if the window is resized so none end up off-screen
+    var resizeTimer;
+    window.addEventListener('resize', function(){
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function(){
+        for (var i = 0; i < stars.length; i++){
+          stars[i].homeX = Math.random() * window.innerWidth;
+          stars[i].homeY = Math.random() * window.innerHeight;
+        }
+      }, 200);
+    });
+  })();
+</script>
+
+</body>
+</html>
